@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://xsi-servlet.latest.j-tools.appspot.com/types/zip"
+	xmlns:tns="http://xsi-servlet.latest.j-tools.appspot.com/types/zip">
+
+	<simpleType name="zip5or9">
+        <restriction base="string">
+            <pattern value="\d{5}($|-\d{4})" />
+        </restriction>
+    </simpleType>
+	
+</schema>

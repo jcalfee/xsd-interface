@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd"
+    version="2.0">
+    
+    <tlib-version>1.0</tlib-version>
+    <function>
+        <name>list</name>
+        <function-class>info.jcalfee.gae.ds.DataStore</function-class>
+        <function-signature>void
+            list(info.jcalfee.xsi.client.XmlSchemaInstance)
+        </function-signature>
+    </function>
+    <function>
+        <name>load</name>
+        <function-class>info.jcalfee.gae.ds.DataStore</function-class>
+        <function-signature>void
+            load(info.jcalfee.xsi.client.XmlSchemaInstance)
+        </function-signature>
+    </function>
+    <tag>
+        <description>Provides XML Schema information</description>
+        <name>Schema Tag</name>
+        <tag-class>info.jcalfee.ds.web.SchemaTag</tag-class>
+        <!-- <attribute>
+            <name>roles</name>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>mail</name>
+            <required>false</required>
+        </attribute>  -->
+    </tag>
+</taglib>

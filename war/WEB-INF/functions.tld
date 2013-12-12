@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+    version="2.0">
+
+    <tlib-version>1.0</tlib-version>
+    <function>
+        <name>space</name>
+        <function-class>info.jcalfee.xsi.FunctionUtil</function-class>
+        <function-signature>java.lang.String space(java.lang.String)
+        </function-signature>
+    </function>
+    <function>
+        <name>format</name>
+        <function-class>info.jcalfee.xsi.FunctionUtil</function-class>
+        <function-signature>java.lang.String
+            format(java.lang.Object,
+            java.lang.Object)
+        </function-signature>
+    </function>
+    <function>
+        <name>size</name>
+        <function-class>info.jcalfee.xsi.FunctionUtil</function-class>
+        <function-signature>int size(java.util.Collection)
+        </function-signature>
+    </function>
+
+    <function>
+        <name>showNonNull</name>
+        <function-class>info.jcalfee.xsi.FunctionUtil</function-class>
+        <function-signature>String showNonNull(java.lang.String,
+            java.lang.String, java.lang.String)
+        </function-signature>
+    </function>
+</taglib>

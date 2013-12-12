@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://xsi-servlet.latest.j-tools.appspot.com/types/string"
+	xmlns:tns="http://xsi-servlet.latest.j-tools.appspot.com/types/string">
+
+	<simpleType name="string20">
+		<restriction base="string">
+			<maxLength value="20" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="string40">
+		<restriction base="string">
+			<maxLength value="40" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="string60">
+		<restriction base="string">
+			<maxLength value="60" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="string80">
+		<restriction base="string">
+			<maxLength value="80" />
+		</restriction>
+	</simpleType>
+	
+</schema>

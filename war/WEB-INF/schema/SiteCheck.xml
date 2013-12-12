@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<Account name="test account" xmlns="urn:site-check.appspot.com"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:site-check.appspot.com
+    SiteCheck.xsd">
+
+    <User name="jcalfee" role="Admin" email="jcalfee@example.com" />
+
+    <User name="jc" role="Viewer" email="jim@example.com"  /> 
+
+    <Host host="http://example.com" />
+    <Host host="http://example.com?global" fullRequest="Hourly"
+        timeoutRecheck="Hourly" timeZone="(GMT-05:00) Eastern Time" />
+  
+    <Email name="Jim" email="jim@example.com" enabled="true"
+        offline="true" online="false" timeout="false" />
+
+    <Email name="Jimfd
+    fd
+    fds
+    sadf
+    f2" email="jim2@example.com" enabled="true"
+        online="false" />
+
+    <Email email="jcalfee@example.com" enabled="true" />
+
+    <Email email="jim4@example.com" enabled="true" />
+
+    <SMS phone="9541234321" enabled="true" provider="T-Mobile" />
+
+    <SMS phone="95412343212" enabled="true" 
+    provider="Cingular" />
+    
+    <TextArea>3</TextArea>
+
+</Account>

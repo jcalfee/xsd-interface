@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:info.jcalfee.MysteryShopper"
+    xmlns:tns="urn:info.jcalfee.MysteryShopper" xmlns:xsi="urn:info.jcalfee.MysteryShopper"
+    elementFormDefault="qualified">
+
+    <element name="Account" type="tns:Account">
+
+        <key name="accountKey">
+            <selector xpath="tns:Account/tns:Industry" />
+            <field xpath="@name" />
+        </key>
+        <keyref name="accountRef" refer="tns:accountKey">
+            <selector xpath="tns:Host/tns:Notification" />
+            <field xpath="@name" />
+        </keyref>
+        <unique name="notificationUnique">
+            <selector xpath="tns:Account/tns:Industry" />
+            <field xpath="@name" />
+        </unique>
+    </element>
+
+    <complexType name="Account">
+        <sequence>
+            <element name="User" type="tns:Authenticated.User"
+                maxOccurs="unbounded" />
+
+            <element name="Client" type="tns:Client" minOccurs="0"
+                maxOccurs="unbounded" />
+
+            <element name="Shopper" type="tns:MysteryShopper"
+                minOccurs="0" maxOccurs="unbounded" />
+
+            <element name="Industry" type="tns:Industry"
+                maxOccurs="unbounded" />
+
+        </sequence>
+        <attribute name="name" type="tns:string80" />
+        
+    </complexType>
+
+    <complexType name="Client">
+        <sequence>
+            <element name="Contract" type="tns:Contract"
+                minOccurs="0" maxOccurs="unbounded" />
+
+            <element name="Location" type="tns:ClientLocation"
+                minOccurs="1" maxOccurs="unbounded" />
+
+        </sequence>
+        <attribute name="name" type="tns:string40" use="required" />
+        <attribute name="clientName" type="tns:string80" use="required" />
+        <attribute name="title" type="tns:string80" use="required" />
+        <attribute name="industry"
+            xsi:schemaLocation="http://xsi-servlet.latest.j-tools.appspot.com MysteryShopper/Industry" />
+
+        <attributeGroup ref="tns:Address" />
+    </complexType>
+
+    <complexType name="Industry">
+        <attribute name="name" type="tns:string40" use="required" />
+    </complexType>
+
+    <complexType name="ClientLocation">
+        <sequence>
+            <element name="Phone" type="tns:Phone" minOccurs="0"
+                maxOccurs="unbounded" />
+
+            <element name="Hours" type="tns:WeeklyHours" />
+        </sequence>
+        <attribute name="name" type="tns:string40" use="required" />
+        <attribute name="storeId" type="tns:string20" />
+        <attributeGroup ref="tns:Address" />
+    </complexType>
+
+    <complexType name="MysteryShopper">
+        <sequence>
+            <element name="Phone" type="tns:Phone" maxOccurs="unbounded" />
+            <element name="Hours" type="tns:WeeklyHours" />
+        </sequence>
+        <attributeGroup ref="tns:ShoppersName" />
+        <attributeGroup ref="tns:Address" />
+    </complexType>
+
+    <attributeGroup name="ShoppersName">
+        <attribute name="first" type="tns:string40" use="required" />
+        <attribute name="middleInitial" use="required">
+            <simpleType>
+                <restriction base="string">
+                    <maxLength value="1" />
+                    <minLength value="1" />
+                    <pattern value="[A-Za-z]" />
+                </restriction>
+            </simpleType>
+        </attribute>
+        <attribute name="last" type="tns:string40" use="required" />
+    </attributeGroup>
+
+    <complexType name="Contract">
+        <attribute name="name" type="tns:string80" use="required" />
+        <attribute name="start" type="date" use="required" />
+        <attribute name="end" type="date" use="required" />
+    </complexType>
+
+    <complexType name="Phone">
+        <attribute name="phoneNumber" type="string" use="required"/>
+        <attribute name="description" type="tns:string20" use="required" />
+    </complexType>
+
+    <complexType name="WeeklyHours">
+        <sequence>
+            <element name="monday" type="tns:DailyHours"
+                minOccurs="0" maxOccurs="1" />
+            <element name="tuesday" type="tns:DailyHours"
+                minOccurs="0" maxOccurs="1" />
+            <element name="wednesday" type="tns:DailyHours"
+                minOccurs="0" maxOccurs="1" />
+            <element name="thursday" type="tns:DailyHours"
+                minOccurs="0" maxOccurs="1" />
+            <element name="friday" type="tns:DailyHours"
+                minOccurs="0" maxOccurs="1" />
+            <element name="saturday" type="tns:DailyHours"
+                minOccurs="0" maxOccurs="1" />
+            <element name="sunday" type="tns:DailyHours"
+                minOccurs="0" maxOccurs="1" />
+        </sequence>
+    </complexType>
+
+    <complexType name="DailyHours">
+        <attribute name="open" type="time" use="required" />
+        <attribute name="close" type="time" use="required" />
+        <attribute name="lunchStart" type="time" />
+        <attribute name="lunchDuration">
+            <simpleType>
+                <restriction base="tns:string20">
+                    <enumeration id="m30" value="30 Minutes" />
+                    <enumeration id="m60" value="1 Hour" />
+                    <enumeration id="m90" value="1 1/2 Hours" />
+                    <enumeration id="m120" value="2 Hours" />
+                </restriction>
+            </simpleType>
+        </attribute>
+    </complexType>
+
+    <attributeGroup name="Address">
+        <attribute name="addressName" type="tns:string80" use="required">
+            <annotation>
+                <documentation>
+                <![CDATA[Name that will appear above the address]]>
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="street1" type="tns:string80" use="required" />
+        <attribute name="street2" type="tns:string80" use="optional" />
+        <attribute name="city" type="tns:string20" use="required" />
+        <attribute name="state" type="tns:string20" use="required" />
+        <attribute name="zip" type="tns:string20" use="required" />
+        <attribute name="description" type="tns:string80" use="required" />
+    </attributeGroup>
+
+    <complexType name="Authenticated.User">
+        <attribute name="name" type="tns:string80" use="required" />
+        <attribute name="email" type="tns:EmailField" />
+    </complexType>
+
+    <simpleType name="EmailField">
+        <restriction base="tns:string80">
+            <!--  valid email chars .!#$%*/?|^{}`~&'+-=_ -->
+            <pattern
+                value="[_\.\-!#$%\*/\?|^{}`~&amp;'+=a-zA-Z0-9]+@([A-Za-z0-9]+)(([\.\-]?[a-zA-Z0-9]+)*)\.([A-Za-z]{2,9})">
+                <annotation>
+                    <documentation><![CDATA[A valid e-mail address is needed (for example: joe@example.com)]]></documentation>
+                </annotation>
+            </pattern>
+
+        </restriction>
+    </simpleType>
+
+    <simpleType name="string20">
+        <restriction base="string">
+            <maxLength value="20" />
+        </restriction>
+    </simpleType>
+
+    <simpleType name="string40">
+        <restriction base="string">
+            <maxLength value="40" />
+        </restriction>
+    </simpleType>
+
+    <simpleType name="string80">
+        <restriction base="string">
+            <maxLength value="80" />
+
+        </restriction>
+    </simpleType>
+</schema>

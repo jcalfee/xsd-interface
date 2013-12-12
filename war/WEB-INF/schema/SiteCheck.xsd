@@ -1,0 +1,849 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:site-check.appspot.com"
+	xmlns:tns="urn:site-check.appspot.com" elementFormDefault="qualified">
+
+	<element name="Account" type="tns:Account" />
+
+	<complexType name="Account">
+		<sequence>
+
+			<element name="Host" id="HostCheck" type="tns:HostCheck"
+				minOccurs="0" maxOccurs="unbounded" />
+
+			<element name="User" type="tns:User" minOccurs="0" maxOccurs="1" />
+
+		</sequence>
+		<attribute name="accountName" type="tns:string80" use="required" />
+	</complexType>
+
+	<complexType name="User">
+		<sequence>
+			<element name="Email" type="tns:Email" minOccurs="0"
+				maxOccurs="unbounded" />
+
+			<element name="SMS" type="tns:SMS" minOccurs="0" maxOccurs="unbounded" />
+
+		</sequence>
+		<attribute name="name" type="tns:string80" use="required" />
+		<attribute name="timeZone" type="tns:TimeZone" use="required" />
+		<attribute name="role" use="required">
+			<simpleType>
+				<restriction base="tns:string20">
+					<enumeration value="Admin" id="admin" />
+					<enumeration value="Viewer" id="viewer" />
+				</restriction>
+			</simpleType>
+		</attribute>
+	</complexType>
+
+	<simpleType name="EmailField">
+		<restriction base="tns:string80">
+			<!--  valid email chars .!#$%*/?|^{}`~&'+-=_ -->
+			<pattern
+				value="[_\.\-!#$%\*/\?|^{}`~&amp;'+=a-zA-Z0-9]+@([A-Za-z0-9]+)(([\.\-]?[a-zA-Z0-9]+)*)\.([A-Za-z]{2,9})">
+				<annotation>
+					<documentation><![CDATA[A valid e-mail address is needed (for example: joe@example.com)]]></documentation>
+				</annotation>
+			</pattern>
+
+		</restriction>
+	</simpleType>
+
+	<complexType name="HostCheck">
+
+		<attribute name="host" use="required">
+			<annotation>
+				<documentation><![CDATA[
+                HTTP or HTTPS Address
+                <ul>
+                  <li><i>http://example.com</i></li> 
+                  <li><i>https://example.com</i></li>
+                </ul>  
+                
+                <p>You may include additional path information if you have 
+                specific page that should be tested
+                <ul> 
+                  <li><i>http://example.com/myTestPage?site-check</i></li>
+                </ul>
+                <sub>+Other protocols will not work 
+                    (ex: ftp, smtp, example.com:5432, etc..)</sub><p>]]></documentation>
+			</annotation>
+			<simpleType>
+				<restriction base="tns:string160">
+					<pattern
+						value="http://([A-Za-z0-9]+)(([\.\-]?[a-zA-Z0-9]+)*)\.([A-Za-z]{2,9})([/\?].*)?"></pattern>
+					<pattern
+						value="https://([A-Za-z0-9]+)(([\.\-]?[a-zA-Z0-9]+)*)\.([A-Za-z]{2,9})([/\?].*)?"></pattern>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="alerts" type="boolean" default="true">
+			<annotation>
+				<documentation>
+                    <![CDATA[If a host is constantly triggering 
+                    alerts, this feature disables alerts for this host.]]>
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="frequency" default="10 Min">
+			<annotation>
+				<documentation>
+                    <![CDATA[How often this host will be tested.]]>
+				</documentation>
+			</annotation>
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="1 Min" />
+					<enumeration value="5 Min" />
+					<enumeration value="10 Min" />
+					<enumeration value="30 Min" />
+					<enumeration value="1 Hr" />
+				</restriction>
+			</simpleType>
+
+		</attribute>
+		<attributeGroup ref="tns:HostSettings" />
+		<attribute name="status" type="string">
+			<annotation>
+				<documentation>
+                    <![CDATA[The last status]]>
+				</documentation>
+				<appinfo>
+					<readonly />
+				</appinfo>
+			</annotation>
+		</attribute>
+		<attribute name="lastCheck" type="dateTime">
+			<annotation>
+				<documentation>
+                    <![CDATA[The last time this host was checked.]]>
+				</documentation>
+				<appinfo>
+					<readonly />
+				</appinfo>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<attributeGroup name="HostSettings">
+		<attribute name="fullRequest" default="Hourly" type="tns:HTTPFullRequest" />
+
+		<attribute name="timeoutRecheck" default="Hourly">
+			<annotation>
+				<documentation>
+                <![CDATA[Once a timeout is detected, this option
+                    allows less frequent testing.  This allows the server
+                    to make better use of resources.]]>
+				</documentation>
+			</annotation>
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="Hourly" />
+					<enumeration value="Daily" />
+					<enumeration value="Always" />
+				</restriction>
+			</simpleType>
+		</attribute>
+	</attributeGroup>
+
+	<attributeGroup name="HostAlerts">
+		<attribute name="offline" type="boolean" default="true">
+			<annotation>
+				<documentation><![CDATA[
+            Notify when a host goes offline.
+                ]]></documentation>
+			</annotation>
+		</attribute>
+		<attribute name="online" type="boolean" default="false">
+			<annotation>
+				<documentation><![CDATA[
+            Notify when a host comes back online.  This will double 
+            the amount of notifications you will receive.
+                ]]></documentation>
+			</annotation>
+		</attribute>
+		<attribute name="timeout" type="boolean" default="false">
+			<annotation>
+				<documentation><![CDATA[
+                Notify when this host does not respond within 10 
+                seconds.  If your using shared-hosting, this option
+                may trigger a lot of emails.
+                ]]></documentation>
+			</annotation>
+		</attribute>
+	</attributeGroup>
+
+	<complexType name="SMS">
+		<attribute name="provider" type="tns:SMSProvider" use="required" />
+		<attribute name="phone" type="string" use="required" />
+		<attribute name="enabled" type="boolean" default="true" />
+		<attributeGroup ref="tns:HostAlerts" />
+		<attribute name="verification" type="tns:verify" default="Pending" />
+	</complexType>
+
+
+	<complexType name="Email">
+		<attribute name="name" type="tns:string40" use="optional" />
+		<attribute name="email" type="tns:EmailField" use="required">
+			<!--
+				annotation> <appinfo> <noUpdate /> </appinfo> </annotation
+			-->
+		</attribute>
+		<attribute name="enabled" type="boolean" default="true" />
+		<attributeGroup ref="tns:HostAlerts" />
+		<attribute name="verification" type="tns:verify" default="Pending" />
+	</complexType>
+
+	<simpleType name="verify">
+		<annotation>
+			<appinfo>
+				<readonly />
+			</appinfo>
+			<documentation>
+<![CDATA[NOTE: This address will be verified.]]>
+			</documentation>
+		</annotation>
+		<restriction base="tns:string20">
+			<enumeration value="Pending"></enumeration>
+			<enumeration value="Verified"></enumeration>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="HTTPFullRequest">
+		<annotation>
+			<documentation>
+                <![CDATA[A request is made when checking on your host. This
+                option forces a full-page download. A full-page download
+                allows the system to record the download speed.
+                <p>You may check on a host more frequently than the
+                value specified here. When this happens, a much more
+                efficient HEAD request is used. The HEAD request tells
+                the host it need only respond with the headers (which 
+                includes the response status code).</p>]]>
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="Hourly">
+				<annotation>
+					<documentation><![CDATA[Only download the full page once an
+                        hour.]]>
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="Daily">
+				<annotation>
+					<documentation><![CDATA[Only download the full page once a
+                        day.]]>
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="Always">
+				<annotation>
+					<documentation><![CDATA[Always time and download the entire
+                        page at my host.]]>
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="Never">
+				<annotation>
+					<documentation><![CDATA[I don't care about saving the page
+                        download rate.]]>
+					</documentation>
+				</annotation>
+			</enumeration>
+		</restriction>
+	</simpleType>
+
+	<!--
+		<import namespace="http://site-check.appspot.com/SiteCheck"
+		schemaLocation="types/string.xsd" />
+	-->
+	<simpleType name="TimeZone">
+		<restriction base="string">
+			<enumeration value="" />
+			<enumeration value="GMT-11:00" />
+			<enumeration value="GMT-10:00" />
+			<enumeration value="GMT-09:30" />
+			<enumeration value="GMT-09:00" />
+			<enumeration value="GMT-08:00" />
+			<enumeration value="GMT-07:00" />
+			<enumeration value="GMT-06:00" />
+			<enumeration value="GMT-05:00" />
+			<enumeration value="GMT-04:30" />
+			<enumeration value="GMT-04:00" />
+			<enumeration value="GMT-03:30" />
+			<enumeration value="GMT-03:00" />
+			<enumeration value="GMT-02:00" />
+			<enumeration value="GMT-01:00" />
+			<enumeration value="GMT+00:00" />
+			<enumeration value="GMT+01:00" />
+			<enumeration value="GMT+02:00" />
+			<enumeration value="GMT+03:00" />
+			<enumeration value="GMT+03:30" />
+			<enumeration value="GMT+04:00" />
+			<enumeration value="GMT+04:30" />
+			<enumeration value="GMT+05:00" />
+			<enumeration value="GMT+05:30" />
+			<enumeration value="GMT+06:00" />
+			<enumeration value="GMT+06:30" />
+			<enumeration value="GMT+07:00" />
+			<enumeration value="GMT+08:00" />
+			<enumeration value="GMT+09:00" />
+			<enumeration value="GMT+09:30" />
+			<enumeration value="GMT+10:00" />
+			<enumeration value="GMT+11:00" />
+			<enumeration value="GMT+11:30" />
+			<enumeration value="GMT+12:00" />
+			<enumeration value="GMT+13:00" />
+			<enumeration value="GMT+14:00" />
+			<enumeration value="" />
+			<enumeration value="(GMT-11:00) Apia" />
+			<enumeration value="(GMT-11:00) Apia" />
+			<enumeration value="(GMT-11:00) Midway" />
+			<enumeration value="(GMT-11:00) Niue" />
+			<enumeration value="(GMT-11:00) Pago Pago" />
+			<enumeration value="(GMT-10:00) Fakaofo" />
+			<enumeration value="(GMT-10:00) Hawaii Time" />
+			<enumeration value="(GMT-10:00) Johnston" />
+			<enumeration value="(GMT-10:00) Rarotonga" />
+			<enumeration value="(GMT-10:00) Tahiti" />
+			<enumeration value="(GMT-09:30) Marquesas" />
+			<enumeration value="(GMT-09:00) Alaska Time" />
+			<enumeration value="(GMT-09:00) Gambier" />
+			<enumeration value="(GMT-08:00) Pacific Time" />
+			<enumeration value="(GMT-08:00) Pacific Time - Tijuana" />
+			<enumeration value="(GMT-08:00) Pacific Time - Vancouver" />
+			<enumeration value="(GMT-08:00) Pacific Time - Whitehorse" />
+			<enumeration value="(GMT-08:00) Pitcairn" />
+			<enumeration value="(GMT-07:00) Mountain Time" />
+			<enumeration value="(GMT-07:00) Mountain Time - Arizona" />
+			<enumeration value="(GMT-07:00) Mountain Time - Chihuahua, Mazatlan" />
+			<enumeration value="(GMT-07:00) Mountain Time - Dawson Creek" />
+			<enumeration value="(GMT-07:00) Mountain Time - Edmonton" />
+			<enumeration value="(GMT-07:00) Mountain Time - Hermosillo" />
+			<enumeration value="(GMT-07:00) Mountain Time - Yellowknife" />
+			<enumeration value="(GMT-06:00) Belize" />
+			<enumeration value="(GMT-06:00) Central Time" />
+			<enumeration value="(GMT-06:00) Central Time" />
+			<enumeration value="(GMT-06:00) Central Time - Mexico City" />
+			<enumeration value="(GMT-06:00) Central Time - Regina" />
+			<enumeration value="(GMT-06:00) Central Time - Winnipeg" />
+			<enumeration value="(GMT-06:00) Costa Rica" />
+			<enumeration value="(GMT-06:00) Easter Island" />
+			<enumeration value="(GMT-06:00) El Salvador" />
+			<enumeration value="(GMT-06:00) Galapagos" />
+			<enumeration value="(GMT-06:00) Guatemala" />
+			<enumeration value="(GMT-06:00) Managua" />
+			<enumeration value="(GMT-05:00) Bogota" />
+			<enumeration value="(GMT-05:00) Cayman" />
+			<enumeration value="(GMT-05:00) Eastern Time" />
+			<enumeration value="(GMT-05:00) Eastern Time - Iqaluit" />
+			<enumeration value="(GMT-05:00) Eastern Time - Montreal" />
+			<enumeration value="(GMT-05:00) Eastern Time - Toronto" />
+			<enumeration value="(GMT-05:00) Grand Turk" />
+			<enumeration value="(GMT-05:00) Guayaquil" />
+			<enumeration value="(GMT-05:00) Havana" />
+			<enumeration value="(GMT-05:00) Jamaica" />
+			<enumeration value="(GMT-05:00) Lima" />
+			<enumeration value="(GMT-05:00) Nassau" />
+			<enumeration value="(GMT-05:00) Panama" />
+			<enumeration value="(GMT-05:00) Port-au-Prince" />
+			<enumeration value="(GMT-04:30) Caracas" />
+			<enumeration value="(GMT-04:00) Anguilla" />
+			<enumeration value="(GMT-04:00) Antigua" />
+			<enumeration value="(GMT-04:00) Aruba" />
+			<enumeration value="(GMT-04:00) Asuncion" />
+			<enumeration value="(GMT-04:00) Atlantic Time - Halifax" />
+			<enumeration value="(GMT-04:00) Barbados" />
+			<enumeration value="(GMT-04:00) Bermuda" />
+			<enumeration value="(GMT-04:00) Boa Vista" />
+			<enumeration value="(GMT-04:00) Campo Grande" />
+			<enumeration value="(GMT-04:00) Cuiaba" />
+			<enumeration value="(GMT-04:00) Curacao" />
+			<enumeration value="(GMT-04:00) Dominica" />
+			<enumeration value="(GMT-04:00) Grenada" />
+			<enumeration value="(GMT-04:00) Guadeloupe" />
+			<enumeration value="(GMT-04:00) Guyana" />
+			<enumeration value="(GMT-04:00) La Paz" />
+			<enumeration value="(GMT-04:00) Manaus" />
+			<enumeration value="(GMT-04:00) Martinique" />
+			<enumeration value="(GMT-04:00) Montserrat" />
+			<enumeration value="(GMT-04:00) Palmer" />
+			<enumeration value="(GMT-04:00) Port of Spain" />
+			<enumeration value="(GMT-04:00) Porto Velho" />
+			<enumeration value="(GMT-04:00) Puerto Rico" />
+			<enumeration value="(GMT-04:00) Rio Branco" />
+			<enumeration value="(GMT-04:00) Santiago" />
+			<enumeration value="(GMT-04:00) Santo Domingo" />
+			<enumeration value="(GMT-04:00) St. Kitts" />
+			<enumeration value="(GMT-04:00) St. Lucia" />
+			<enumeration value="(GMT-04:00) St. Thomas" />
+			<enumeration value="(GMT-04:00) St. Vincent" />
+			<enumeration value="(GMT-04:00) Stanley" />
+			<enumeration value="(GMT-04:00) Thule" />
+			<enumeration value="(GMT-04:00) Tortola" />
+			<enumeration value="(GMT-03:30) Newfoundland Time - St. Johns" />
+			<enumeration value="(GMT-03:00) Araguaina" />
+			<enumeration value="(GMT-03:00) Belem" />
+			<enumeration value="(GMT-03:00) Buenos Aires" />
+			<enumeration value="(GMT-03:00) Cayenne" />
+			<enumeration value="(GMT-03:00) Fortaleza" />
+			<enumeration value="(GMT-03:00) Godthab" />
+			<enumeration value="(GMT-03:00) Maceio" />
+			<enumeration value="(GMT-03:00) Miquelon" />
+			<enumeration value="(GMT-03:00) Montevideo" />
+			<enumeration value="(GMT-03:00) Paramaribo" />
+			<enumeration value="(GMT-03:00) Recife" />
+			<enumeration value="(GMT-03:00) Rothera" />
+			<enumeration value="(GMT-03:00) Salvador" />
+			<enumeration value="(GMT-03:00) Sao Paulo" />
+			<enumeration value="(GMT-02:00) Noronha" />
+			<enumeration value="(GMT-02:00) South Georgia" />
+			<enumeration value="(GMT-01:00) Azores" />
+			<enumeration value="(GMT-01:00) Cape Verde" />
+			<enumeration value="(GMT-01:00) Scoresbysund" />
+			<enumeration value="(GMT+00:00) Abidjan" />
+			<enumeration value="(GMT+00:00) Accra" />
+			<enumeration value="(GMT+00:00) Bamako" />
+			<enumeration value="(GMT+00:00) Banjul" />
+			<enumeration value="(GMT+00:00) Bissau" />
+			<enumeration value="(GMT+00:00) Canary Islands" />
+			<enumeration value="(GMT+00:00) Casablanca" />
+			<enumeration value="(GMT+00:00) Conakry" />
+			<enumeration value="(GMT+00:00) Dakar" />
+			<enumeration value="(GMT+00:00) Danmarkshavn" />
+			<enumeration value="(GMT+00:00) Dublin" />
+			<enumeration value="(GMT+00:00) El Aaiun" />
+			<enumeration value="(GMT+00:00) Faeroe" />
+			<enumeration value="(GMT+00:00) Freetown" />
+			<enumeration value="(GMT+00:00) Lisbon" />
+			<enumeration value="(GMT+00:00) Lome" />
+			<enumeration value="(GMT+00:00) London" />
+			<enumeration value="(GMT+00:00) Monrovia" />
+			<enumeration value="(GMT+00:00) Nouakchott" />
+			<enumeration value="(GMT+00:00) Ouagadougou" />
+			<enumeration value="(GMT+00:00) Reykjavik" />
+			<enumeration value="(GMT+00:00) Sao Tome" />
+			<enumeration value="(GMT+00:00) St Helena" />
+			<enumeration value="(GMT+01:00) Algiers" />
+			<enumeration value="(GMT+01:00) Amsterdam" />
+			<enumeration value="(GMT+01:00) Andorra" />
+			<enumeration value="(GMT+01:00) Bangui" />
+			<enumeration value="(GMT+01:00) Berlin" />
+			<enumeration value="(GMT+01:00) Brazzaville" />
+			<enumeration value="(GMT+01:00) Brussels" />
+			<enumeration value="(GMT+01:00) Budapest" />
+			<enumeration value="(GMT+01:00) Central European Time" />
+			<enumeration value="(GMT+01:00) Central European Time" />
+			<enumeration value="(GMT+01:00) Ceuta" />
+			<enumeration value="(GMT+01:00) Copenhagen" />
+			<enumeration value="(GMT+01:00) Douala" />
+			<enumeration value="(GMT+01:00) Gibraltar" />
+			<enumeration value="(GMT+01:00) Kinshasa" />
+			<enumeration value="(GMT+01:00) Lagos" />
+			<enumeration value="(GMT+01:00) Libreville" />
+			<enumeration value="(GMT+01:00) Luanda" />
+			<enumeration value="(GMT+01:00) Luxembourg" />
+			<enumeration value="(GMT+01:00) Madrid" />
+			<enumeration value="(GMT+01:00) Malabo" />
+			<enumeration value="(GMT+01:00) Malta" />
+			<enumeration value="(GMT+01:00) Monaco" />
+			<enumeration value="(GMT+01:00) Ndjamena" />
+			<enumeration value="(GMT+01:00) Niamey" />
+			<enumeration value="(GMT+01:00) Oslo" />
+			<enumeration value="(GMT+01:00) Paris" />
+			<enumeration value="(GMT+01:00) Porto-Novo" />
+			<enumeration value="(GMT+01:00) Rome" />
+			<enumeration value="(GMT+01:00) Stockholm" />
+			<enumeration value="(GMT+01:00) Tirane" />
+			<enumeration value="(GMT+01:00) Tunis" />
+			<enumeration value="(GMT+01:00) Vaduz" />
+			<enumeration value="(GMT+01:00) Vienna" />
+			<enumeration value="(GMT+01:00) Warsaw" />
+			<enumeration value="(GMT+01:00) Windhoek" />
+			<enumeration value="(GMT+01:00) Zurich" />
+			<enumeration value="(GMT+02:00) Amman" />
+			<enumeration value="(GMT+02:00) Athens" />
+			<enumeration value="(GMT+02:00) Beirut" />
+			<enumeration value="(GMT+02:00) Blantyre" />
+			<enumeration value="(GMT+02:00) Bucharest" />
+			<enumeration value="(GMT+02:00) Bujumbura" />
+			<enumeration value="(GMT+02:00) Cairo" />
+			<enumeration value="(GMT+02:00) Chisinau" />
+			<enumeration value="(GMT+02:00) Damascus" />
+			<enumeration value="(GMT+02:00) Gaborone" />
+			<enumeration value="(GMT+02:00) Gaza" />
+			<enumeration value="(GMT+02:00) Harare" />
+			<enumeration value="(GMT+02:00) Helsinki" />
+			<enumeration value="(GMT+02:00) Istanbul" />
+			<enumeration value="(GMT+02:00) Jerusalem" />
+			<enumeration value="(GMT+02:00) Johannesburg" />
+			<enumeration value="(GMT+02:00) Kiev" />
+			<enumeration value="(GMT+02:00) Kigali" />
+			<enumeration value="(GMT+02:00) Lubumbashi" />
+			<enumeration value="(GMT+02:00) Lusaka" />
+			<enumeration value="(GMT+02:00) Maputo" />
+			<enumeration value="(GMT+02:00) Maseru" />
+			<enumeration value="(GMT+02:00) Mbabane" />
+			<enumeration value="(GMT+02:00) Minsk" />
+			<enumeration value="(GMT+02:00) Moscow-01 - Kaliningrad" />
+			<enumeration value="(GMT+02:00) Nicosia" />
+			<enumeration value="(GMT+02:00) Riga" />
+			<enumeration value="(GMT+02:00) Sofia" />
+			<enumeration value="(GMT+02:00) Tallinn" />
+			<enumeration value="(GMT+02:00) Tripoli" />
+			<enumeration value="(GMT+02:00) Vilnius" />
+			<enumeration value="(GMT+03:00) Addis Ababa" />
+			<enumeration value="(GMT+03:00) Aden" />
+			<enumeration value="(GMT+03:00) Antananarivo" />
+			<enumeration value="(GMT+03:00) Asmera" />
+			<enumeration value="(GMT+03:00) Baghdad" />
+			<enumeration value="(GMT+03:00) Bahrain" />
+			<enumeration value="(GMT+03:00) Comoro" />
+			<enumeration value="(GMT+03:00) Dar es Salaam" />
+			<enumeration value="(GMT+03:00) Djibouti" />
+			<enumeration value="(GMT+03:00) Kampala" />
+			<enumeration value="(GMT+03:00) Khartoum" />
+			<enumeration value="(GMT+03:00) Kuwait" />
+			<enumeration value="(GMT+03:00) Mayotte" />
+			<enumeration value="(GMT+03:00) Mogadishu" />
+			<enumeration value="(GMT+03:00) Moscow+00" />
+			<enumeration value="(GMT+03:00) Moscow+00 - Samara" />
+			<enumeration value="(GMT+03:00) Nairobi" />
+			<enumeration value="(GMT+03:00) Qatar" />
+			<enumeration value="(GMT+03:00) Riyadh" />
+			<enumeration value="(GMT+03:00) Syowa" />
+			<enumeration value="(GMT+03:30) Tehran" />
+			<enumeration value="(GMT+04:00) Baku" />
+			<enumeration value="(GMT+04:00) Dubai" />
+			<enumeration value="(GMT+04:00) Mahe" />
+			<enumeration value="(GMT+04:00) Mauritius" />
+			<enumeration value="(GMT+04:00) Muscat" />
+			<enumeration value="(GMT+04:00) Reunion" />
+			<enumeration value="(GMT+04:00) Tbilisi" />
+			<enumeration value="(GMT+04:00) Yerevan" />
+			<enumeration value="(GMT+04:30) Kabul" />
+			<enumeration value="(GMT+05:00) Aqtau" />
+			<enumeration value="(GMT+05:00) Aqtobe" />
+			<enumeration value="(GMT+05:00) Ashgabat" />
+			<enumeration value="(GMT+05:00) Dushanbe" />
+			<enumeration value="(GMT+05:00) Karachi" />
+			<enumeration value="(GMT+05:00) Kerguelen" />
+			<enumeration value="(GMT+05:00) Maldives" />
+			<enumeration value="(GMT+05:00) Mawson" />
+			<enumeration value="(GMT+05:00) Moscow+02 - Yekaterinburg" />
+			<enumeration value="(GMT+05:00) Tashkent" />
+			<enumeration value="(GMT+05:30) Colombo" />
+			<enumeration value="(GMT+05:30) India Standard Time" />
+			<enumeration value="(GMT+06:00) Almaty" />
+			<enumeration value="(GMT+06:00) Bishkek" />
+			<enumeration value="(GMT+06:00) Chagos" />
+			<enumeration value="(GMT+06:00) Dhaka" />
+			<enumeration value="(GMT+06:00) Moscow+03 - Omsk, Novosibirsk" />
+			<enumeration value="(GMT+06:00) Thimphu" />
+			<enumeration value="(GMT+06:00) Vostok" />
+			<enumeration value="(GMT+06:30) Cocos" />
+			<enumeration value="(GMT+06:30) Rangoon" />
+			<enumeration value="(GMT+07:00) Bangkok" />
+			<enumeration value="(GMT+07:00) Christmas" />
+			<enumeration value="(GMT+07:00) Davis" />
+			<enumeration value="(GMT+07:00) Hanoi" />
+			<enumeration value="(GMT+07:00) Hovd" />
+			<enumeration value="(GMT+07:00) Jakarta" />
+			<enumeration value="(GMT+07:00) Moscow+04 - Krasnoyarsk" />
+			<enumeration value="(GMT+07:00) Phnom Penh" />
+			<enumeration value="(GMT+07:00) Vientiane" />
+			<enumeration value="(GMT+08:00) Brunei" />
+			<enumeration value="(GMT+08:00) Casey" />
+			<enumeration value="(GMT+08:00) China Time - Beijing" />
+			<enumeration value="(GMT+08:00) Choibalsan" />
+			<enumeration value="(GMT+08:00) Hong Kong" />
+			<enumeration value="(GMT+08:00) Kuala Lumpur" />
+			<enumeration value="(GMT+08:00) Macau" />
+			<enumeration value="(GMT+08:00) Makassar" />
+			<enumeration value="(GMT+08:00) Manila" />
+			<enumeration value="(GMT+08:00) Moscow+05 - Irkutsk" />
+			<enumeration value="(GMT+08:00) Singapore" />
+			<enumeration value="(GMT+08:00) Taipei" />
+			<enumeration value="(GMT+08:00) Ulaanbaatar" />
+			<enumeration value="(GMT+08:00) Western Time - Perth" />
+			<enumeration value="(GMT+09:00) Dili" />
+			<enumeration value="(GMT+09:00) Jayapura" />
+			<enumeration value="(GMT+09:00) Moscow+06 - Yakutsk" />
+			<enumeration value="(GMT+09:00) Palau" />
+			<enumeration value="(GMT+09:00) Pyongyang" />
+			<enumeration value="(GMT+09:00) Seoul" />
+			<enumeration value="(GMT+09:00) Tokyo" />
+			<enumeration value="(GMT+09:30) Central Time - Adelaide" />
+			<enumeration value="(GMT+09:30) Central Time - Darwin" />
+			<enumeration value="(GMT+10:00) Dumont D&#39;Urville" />
+			<enumeration value="(GMT+10:00) Eastern Time - Brisbane" />
+			<enumeration value="(GMT+10:00) Eastern Time - Hobart" />
+			<enumeration value="(GMT+10:00) Eastern Time - Melbourne, Sydney" />
+			<enumeration value="(GMT+10:00) Guam" />
+			<enumeration value="(GMT+10:00) Moscow+07 - Yuzhno-Sakhalinsk" />
+			<enumeration value="(GMT+10:00) Port Moresby" />
+			<enumeration value="(GMT+10:00) Saipan" />
+			<enumeration value="(GMT+10:00) Truk" />
+			<enumeration value="(GMT+11:00) Efate" />
+			<enumeration value="(GMT+11:00) Guadalcanal" />
+			<enumeration value="(GMT+11:00) Kosrae" />
+			<enumeration value="(GMT+11:00) Moscow+08 - Magadan" />
+			<enumeration value="(GMT+11:00) Moscow+08 - Petropavlovsk-Kamchatskiy" />
+			<enumeration value="(GMT+11:00) Noumea" />
+			<enumeration value="(GMT+11:00) Ponape" />
+			<enumeration value="(GMT+11:30) Norfolk" />
+			<enumeration value="(GMT+12:00) Antarctica/McMurdo" />
+			<enumeration value="(GMT+12:00) Antarctica/South_Pole" />
+			<enumeration value="(GMT+12:00) Auckland" />
+			<enumeration value="(GMT+12:00) Fiji" />
+			<enumeration value="(GMT+12:00) Funafuti" />
+			<enumeration value="(GMT+12:00) Kwajalein" />
+			<enumeration value="(GMT+12:00) Majuro" />
+			<enumeration value="(GMT+12:00) Nauru" />
+			<enumeration value="(GMT+12:00) Tarawa" />
+			<enumeration value="(GMT+12:00) Wake" />
+			<enumeration value="(GMT+12:00) Wallis" />
+			<enumeration value="(GMT+13:00) Tongatapu" />
+			<enumeration value="(GMT+14:00) Kiritimati" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="SMSProvider">
+		<restriction base="string">
+			<enumeration value="" />
+			<enumeration id="message.alltel.com" value="Alltel" />
+			<enumeration id="mmode.com"
+				value="AT&amp;T Wireless (now part of Cingular)" />
+			<enumeration id="myboostmobile.com" value="Boost Mobile" />
+			<enumeration id="cingularme.com" value="Cingular" />
+			<enumeration id="messaging.nextel.com" value="Nextel (now part of Sprint Nextel)" />
+			<enumeration id="messaging.sprintpcs.com" value="Sprint PCS (now Sprint Nextel)" />
+			<enumeration id="tmomail.net" value="T-Mobile" />
+			<enumeration id="vtext.com" value="Verizon" />
+			<enumeration id="vmobl.com" value="Virgin Mobile USA" />
+			<enumeration id="sms.3rivers.net" value="3 River Wireless (phone number)" />
+			<enumeration id="advantagepaging.com" value="Advantage Communications (pager number)" />
+			<enumeration id="myairmail.com" value="Airtouch Pagers (pager number)" />
+			<enumeration id="alphapage.airtouch.com" value="Airtouch Pagers (pager number)" />
+			<enumeration id="airtouch.net" value="Airtouch Pagers (pager number)" />
+			<enumeration id="airtouchpaging.com" value="Airtouch Pagers (pager number)" />
+			<enumeration id="alphanow.net" value="AlphNow (pin)" />
+			<enumeration id="alltelmessage.com" value="alltel (phone number)" />
+			<enumeration id="paging.acswireless.com" value="ACS Wireless (phone or pager)" />
+			<enumeration id="pageapi.com" value="Ameritech Paging (pager number)" />
+			<enumeration id="clearpath.acswireless.com" value="Ameritech Clearpath (pager number)" />
+			<enumeration id="airtelap.com" value="Andhra Pradesh Airtel (phone number)" />
+			<enumeration id="archwireless.net" value="Arch Pagers (PageNet) (phone or pager)" />
+			<enumeration id="epage.arch.com" value="Arch Pagers (PageNet) (pager number)" />
+			<enumeration id="mobile.att.net" value="AT&amp;T PCS (phone number)" />
+			<enumeration id="dpcs.mobile.att.net" value="AT&amp;T Pocketnet PCS (phone number)" />
+			<enumeration id="beepwear.net" value="beepwear (pager number)" />
+			<enumeration id="sms.beemail.ru" value="BeeLine GSM (phone number)" />
+			<enumeration id="message.bam.com" value="Bell Atlantic (phone number)" />
+			<enumeration id="txt.bellmobility.ca" value="Bell Canada (phone number)" />
+			<enumeration id="bellmobility.ca" value="Bell Canada (phone number)" />
+			<enumeration id="txt.bell.ca" value="Bell Mobility (Canada) (phone number)" />
+			<enumeration id="bellsouthtips.com" value="Bell South (Blackberry) number" />
+			<enumeration id="sms.bellsouth.com" value="Bell South (phone number)" />
+			<enumeration id="wireless.bellsouth.com" value="Bell South (phone number)" />
+			<enumeration id="blsdcs.net" value="Bell South (phone number)" />
+			<enumeration id="bellsouth.cl" value="Bell South (phone number)" />
+			<enumeration id="blueskyfrog.com" value="Blue Sky Frog (phone number)" />
+			<enumeration id="sms.bluecell.com" value="Bluegrass Cellular (phone number)" />
+			<enumeration id="bplmobile.com" value="BPL mobile (phone number)" />
+			<enumeration id="cwmovil.com"
+				value="Cable &amp; wireless, Panama (cell number)" />
+			<enumeration id="cmcpaging.com"
+				value="Carolina Mobile Communications (pager number)" />
+			<enumeration id="phone.cellone.net" value="Cellular One East Coast (phone number)" />
+			<enumeration id="swmsg.com" value="Cellular One South West (phone number)" />
+			<enumeration id="paging.cellone-sf.com" value="Cellular One PCS (phone number)" />
+			<enumeration id="mobile.celloneusa.com" value="Cellular One (phone number)" />
+			<enumeration id="cellularone.txtmsg.com" value="Cellular One (phone number)" />
+			<enumeration id="cellularone.textmsg.com" value="Cellular One (phone number)" />
+			<enumeration id="cell1.textmsg.com" value="Cellular One (phone number)" />
+			<enumeration id="message.cellone-sf.com" value="Cellular One (phone number)" />
+			<enumeration id="sbcemail.com" value="Cellular One (phone number)" />
+			<enumeration id="mycellone.com" value="Cellular One West (phone number)" />
+			<enumeration id="csouth1.com" value="Cellular South (phone number)" />
+			<enumeration id="cvcpaging.com"
+				value="Central Vermont Communications (pager number)" />
+			<enumeration id="messaging.centurytel.net" value="CenturyTel (phone number)" />
+			<enumeration id="rpgmail.net" value="Chennai RPG Cellular (phone number)" />
+			<enumeration id="airtelchennai.com" value="Chennai Skycell / Airtel (phone number)" />
+			<enumeration id="mycingular.textmsg.com" value="Cingular Wireless (phone number)" />
+			<enumeration id="mobile.mycingular.com" value="Cingular Wireless (phone number)" />
+			<enumeration id="mobile.mycingular.net" value="Cingular Wireless (phone number)" />
+			<enumeration id="msg.clearnet.com" value="clearnet (phone number)" />
+			<enumeration id="comcastpcs.textmsg.com" value="comcast (phone number)" />
+			<enumeration id="pageme.comspeco.net" value="Communication Specialists (7-digit pin)" />
+			<enumeration id="pager.comspeco.com"
+				value="Communication Specialist Companies (pin)" />
+			<enumeration id="sms.comviq.se" value="comviq number" />
+			<enumeration id="cookmail.com" value="Cook Paging (pager number)" />
+			<enumeration id="corrwireless.net"
+				value="Corr Wireless Communications (phone number)" />
+			<enumeration id="airtelmail.com" value="Delhi Aritel (phone number)" />
+			<enumeration id="delhi.hutch.co.in" value="Delhi Hutch (phone number)" />
+			<enumeration id="page.hit.net" value="Digi-Page / Page Kansas (pager number)" />
+			<enumeration id="mobile.dobson.net" value="Dobson Cellular Systems (phone number)" />
+			<enumeration id="mobile.cellularone.com"
+				value="Dobson-Alex Wireless / Dobson-Cellular One (phone number)" />
+			<enumeration id="t-mobile-sms.de" value="DT T-Mobile (phone number)" />
+			<enumeration id="sms.orange.nl" value="Dutchtone / Orange-NL (phone number)" />
+			<enumeration id="sms.edgewireless.com" value="Edge Wireless (phone number)" />
+			<enumeration id="sms.emt.ee" value="EMT (phone number)" />
+			<enumeration id="fido.ca" value="fido (phone number)" />
+			<enumeration id="sendabeep.net"
+				value="Galaxy Corporation (10 digit pager number.epage)" />
+			<enumeration id="webpager.us" value="GCS Paging (pager number)" />
+			<enumeration id="sms.goldentele.com" value="Golden Telecom (phone number)" />
+			<enumeration id="epage.porta-phone.com" value="GrayLink / Porta-Phone (pager number)" />
+			<enumeration id="airmessage.net" value="GTE number" />
+			<enumeration id="gte.pagegate.net" value="GTE number" />
+			<enumeration id="messagealert.com" value="GTE (phone number)" />
+			<enumeration id="celforce.com" value="Gujarat Celforce (phone number)" />
+			<enumeration id="text.houstoncellular.net" value="Houston Cellular number" />
+			<enumeration id="ideacellular.net" value="Idea Cellular (phone number)" />
+			<enumeration id="page.infopagesystems.com" value="Infopage Systems pinnumber" />
+			<enumeration id="inlandlink.com"
+				value="Inland Cellular Telephone (phone number)" />
+			<enumeration id="pager.tdspager.com" value="The Indiana Paging Co last4digits" />
+			<enumeration id="jsmtel.com" value="JSM Tele-Page pinnumber" />
+			<enumeration id="escotelmobile.com" value="Kerala Escotel (phone number)" />
+			<enumeration id="airtelkol.com" value="Kolkata Airtel (phone number)" />
+			<enumeration id="e-page.net" value="Lauttamus Communication (pager number)" />
+			<enumeration id="smsmail.lmt.lv" value="LMT (phone number)" />
+			<enumeration id="text.mtsmobility.com" value="Manitoba Telecom Systems (phone number)" />
+			<enumeration id="mci.com" value="MCI Phone (phone number)" />
+			<enumeration id="pagemci.com" value="MCI (phone number)" />
+			<enumeration id="mymeteor.ie" value="meteor (phone number)" />
+			<enumeration id="sms.mymeteor.ie" value="meteor (phone number)" />
+			<enumeration id="page.metrocall.com" value="metrocall (pager number)" />
+			<enumeration id="my2way.com" value="metrocall 2-way (pager number)" />
+			<enumeration id="mymetropcs.com" value="Metro PCS (phone number)" />
+			<enumeration id="metropcs.sms.us" value="Metro PCS (phone number)" />
+			<enumeration id="clearlydigital.com" value="Midwest Wireless (phone number)" />
+			<enumeration id="page.mobilcom.net" value="Mobilecom PA (pager number)" />
+			<enumeration id="mobilecomm.net" value="mobilecomm number" />
+			<enumeration id="m1.com.sg" value="mobileone (phone number)" />
+			<enumeration id="page.mobilfone.com" value="mobilfone (phone number)" />
+			<enumeration id="ml.bm" value="Mobility Bermuda (phone number)" />
+			<enumeration id="mobistar.be" value="Mobistar Belgium (phone number)" />
+			<enumeration id="sms.co.tz" value="Mobitel Tanzania (phone number)" />
+			<enumeration id="mobtel.co.yu" value="Mobtel Srbija (phone number)" />
+			<enumeration id="beepone.net" value="Morris Wireless (pager number)" />
+			<enumeration id="isp.com" value="motient number" />
+			<enumeration id="correo.movistar.net" value="movistar number" />
+			<enumeration id="orangemail.co.in" value="Mumbai Orange (phone number)" />
+			<enumeration id="wirefree.informe.ca" value="NBTel number" />
+			<enumeration id="sms.netcom.no" value="netcom (phone number)" />
+			<enumeration id="page.nextel.com" value="nextel (phone number)" />
+			<enumeration id="nextel.com.br" value="nextel (phone number)" />
+			<enumeration id="npiwireless.com" value="NPI Wireless (phone number)" />
+			<enumeration id="pcs.ntelos.com" value="ntelos number" />
+			<enumeration id="o2.co.uk" value="O2 name" />
+			<enumeration id="mmail.co.uk" value="O2 (M-mail) number" />
+			<enumeration id="omnipoint.com" value="omnipoint number" />
+			<enumeration id="omnipointpcs.com" value="omnipoint (phone number)" />
+			<enumeration id="onemail.at" value="One Connect Austria (phone number)" />
+			<enumeration id="onlinebeep.net" value="OnlineBeep (phone number)" />
+			<enumeration id="optusmobile.com.au" value="Optus Mobile (phone number)" />
+			<enumeration id="orange.net" value="orange (phone number)" />
+			<enumeration id="mujoskar.cz" value="oskar (phone number)" />
+			<enumeration id="sms.luxgsm.lu" value="P&amp;T Luxembourg (phone number)" />
+			<enumeration id="pacbellpcs.net" value="Pacific Bell (phone number)" />
+			<enumeration id="pagemart.net" value="PageMart 7digitpinnumber" />
+			<enumeration id="pmcl.net" value="PageMart Canada (pager number)" />
+			<enumeration id="pagegate.pagenet.ca" value="PageNet Canada (phone number)" />
+			<enumeration id="page1nw.com" value="PageOne NorthWest 10digitnumber" />
+			<enumeration id="pcsone.net" value="PCS One (phone number)" />
+			<enumeration id="msg.pioneerenidcellular.com" value="Pioneer / Enid Cellular (phone number)" />
+			<enumeration id="text.plusgsm.pl" value="PlusGSM (phone number)" />
+			<enumeration id="mobilecell1se.com" value="Price Communications (phone number)" />
+			<enumeration id="textmsg.com" value="primco number@primeco" />
+			<enumeration id="sms.primtel.ru" value="primtel (phone number)" />
+			<enumeration id="page.propage.net" value="ProPage 7digit(pager number)" />
+			<enumeration id="sms.pscel.com" value="Public Service Cellular (phone number)" />
+			<enumeration id="pager.qualcomm.com" value="qualcomm name" />
+			<enumeration id="qwestmp.com" value="qwest (phone number)" />
+			<enumeration id="ram-page.com" value="RAM Page number" />
+			<enumeration id="pcs.rogers.com" value="Rogers AT&amp;T Wireless (phone number)" />
+			<enumeration id="safaricomsms.com" value="safaricom (phone number)" />
+			<enumeration id="satelindogsm.com" value="Satelindo GSM (phone number)" />
+			<enumeration id="satellink.net" value="satellink 10digitpagernumber.pageme" />
+			<enumeration id="scs-900.ru" value="SCS-900 (phone number)" />
+			<enumeration id="sfr.fr" value="SFR France (phone number)" />
+			<enumeration id="skytel.com" value="Skytel Pagers 7digitpinnumber" />
+			<enumeration id="email.skytel.com" value="Skytel Pagers number" />
+			<enumeration id="text.simplefreedom.net" value="Simple Freedom (phone number)" />
+			<enumeration id="mysmart.mymobile.ph" value="Smart Telecom (phone number)" />
+			<enumeration id="page.southernlinc.com" value="Southern LINC (phone number)" />
+			<enumeration id="email.swbw.com" value="Southwestern Bell number" />
+			<enumeration id="sprintpaging.com" value="sprint (phone number)" />
+			<enumeration id="page.stpaging.com" value="ST Paging (pin)" />
+			<enumeration id="tms.suncom.com" value="SunCom number" />
+			<enumeration id="suncom1.com" value="SunCom number" />
+			<enumeration id="mysunrise.ch" value="Sunrise Mobile (phone number)" />
+			<enumeration id="freesurf.ch" value="Sunrise Mobile (phone number)" />
+			<enumeration id="mobile.surewest.com" value="Surewest Communicaitons (phone number)" />
+			<enumeration id="bluewin.ch" value="swisscom (phone number)" />
+			<enumeration id="sms.t-mobile.at" value="T-Mobile Austria (phone number)" />
+			<enumeration id="t-d1-sms.de" value="T-Mobile Germany (phone number)" />
+			<enumeration id="t-mobile.uk.net" value="T-Mobile UK (phone number)" />
+			<enumeration id="sms.tele2.lv" value="Tele2 Latvia (phone number)" />
+			<enumeration id="movistar.net" value="Telefonica Movistar (phone number)" />
+			<enumeration id="mobilpost.no" value="telenor (phone number)" />
+			<enumeration id="pageme.teletouch.com" value="teletouch (pager number)" />
+			<enumeration id="gsm1800.telia.dk" value="Telia Denmark (phone number)" />
+			<enumeration id="msg.telus.com" value="telus (phone number)" />
+			<enumeration id="timnet.com" value="TIM (phone number)" />
+			<enumeration id="alphame.com" value="TSR Wireless (pager number)" />
+			<enumeration id="beep.com" value="TSR Wireless (pager number)" />
+			<enumeration id="sms.umc.com.ua" value="UMC (phone number)" />
+			<enumeration id="utext.com" value="unicel (phone number)" />
+			<enumeration id="sms.uraltel.ru" value="uraltel (phone number)" />
+			<enumeration id="email.uscc.net" value="US Cellular (phone number)" />
+			<enumeration id="uscc.textmsg.com" value="US Cellular (phone number)" />
+			<enumeration id="uswestdatamail.com" value="US West number" />
+			<enumeration id="myvzw.com" value="Verizon PCS (phone number)" />
+			<enumeration id="pager.irkutsk.ru" value="vessotel (phone number)" />
+			<enumeration id="vxtras.com" value="Virgin Mobile (phone number)" />
+			<enumeration id="sms.vodafone.it" value="Vodafone Italy number" />
+			<enumeration id="c.vodafone.ne.jp" value="Vodafone Japan (phone number)" />
+			<enumeration id="h.vodafone.ne.jp" value="Vodafone Japan (phone number)" />
+			<enumeration id="t.vodafone.ne.jp" value="Vodafone Japan (phone number)" />
+			<enumeration id="vodafone.es" value="Vodafone Spain (phone number)" />
+			<enumeration id="vodafone.net" value="Vodafone UK (phone number)" />
+			<enumeration id="voicestream.net" value="VoiceStream / T-Mobile (phone number)" />
+			<enumeration id="sms.wcc.net" value="West Central Wireless (phone number)" />
+			<enumeration id="cellularonewest.com" value="Western Wireless (phone number)" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="string20">
+		<restriction base="string">
+			<maxLength value="20" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="string40">
+		<restriction base="string">
+			<maxLength value="40" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="string80">
+		<restriction base="string">
+			<maxLength value="80" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="string160">
+		<restriction base="string">
+			<maxLength value="160" />
+		</restriction>
+	</simpleType>
+
+</schema>

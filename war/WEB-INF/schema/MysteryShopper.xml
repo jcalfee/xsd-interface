@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Account name="test account" xmlns="urn:site-check.appspot.com"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:site-check.appspot.com
+    MysteryShopper.xsd">
+    
+    <Client addressName="" state="" name="" zip="" street1="" city="" clientName="" title="" description=""></Client>
+</Account>

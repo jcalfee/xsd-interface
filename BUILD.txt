@@ -1,0 +1,18 @@
+
+
+Create a new Eclipse Project from these source files.  The classes output directory
+should be war/WEB-INF/classes.
+
+Convert into an App Engine project:
+http://stackoverflow.com/questions/1199266/converting-an-eclipse-java-project-to-a-google-appengine-one
+
+Add Testing libs to fix remaining compiler errors:
+Test cases require additional SDK JARs from lib/impl:
+  lib/impl/appengine-api-stubs.jar
+  lib/impl/appengine-local-runtime.jar
+  lib/testing/appengine-testing.jar
+
+Additional JARs needed in web/WEB-INF/lib 
+(not checked in for size reasons)
+ /home/jcalfee/libs/compass-2.3.0-beta1.jar
+ /home/jcalfee/libs/commons-logging.jar

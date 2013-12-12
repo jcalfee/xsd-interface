@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+    targetNamespace="http://xsi-servlet.latest.j-tools.appspot.com"
+	xmlns:tns="http://xsi-servlet.latest.j-tools.appspot.com"
+	xmlns:new="newNS">
+
+
+	<complexType name="Application">
+		<sequence>
+			<element name="UserAccess" type="tns:User"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="User">
+		<sequence>
+			<element name="Owner" type="boolean"></element>
+		</sequence>
+	</complexType>
+
+
+
+	<element name="Application" type="tns:Application">
+	</element>
+	
+	<element name="User" type="tns:User">
+    </element>
+
+
+	<element name="name" type="decimal"/>
+
+	<!-- definition of attributes -->
+	<attribute name="orderid" type="string" />
+
+	<!-- definition of complex elements -->
+	<element name="shipto" >
+		<complexType>
+			<sequence xmlns:lib2="def">
+				<element ref="tns:name" xmlns:lib2="abc" />
+			</sequence>
+		</complexType>
+	</element>
+	
+	
+</schema>
+

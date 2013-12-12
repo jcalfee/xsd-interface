@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    version="2.5">
+    
+    <servlet>
+        <servlet-name>XsiServlet</servlet-name>
+        <servlet-class>info.jcalfee.gae.ds.XsiServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>XsiServlet</servlet-name>
+        <url-pattern>/PhoneBanking/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>XsiServlet</servlet-name>
+        <url-pattern>/Time/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>XsiServlet</servlet-name>
+        <url-pattern>/SiteCheck/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>XsiServlet</servlet-name>
+        <url-pattern>/MysteryShopper/*</url-pattern>
+    </servlet-mapping>
+
+    <security-constraint><!-- Login access -->
+        <web-resource-collection>
+            <web-resource-name>User Pages</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>*</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <taglib>
+        <taglib-uri>functions</taglib-uri>
+        <taglib-location>/WEB-INF/functions.tld</taglib-location>
+    </taglib>
+    
+    <taglib>
+        <taglib-uri>dataStore</taglib-uri>
+        <taglib-location>/WEB-INF/dataStore.tld</taglib-location>
+    </taglib>
+
+</web-app>

@@ -1,0 +1,6 @@
+.settings/
+.classpath
+war/WEB-INF/appengine-generated/
+war/WEB-INF/classes/
+tmp/
+war/WEB-INF/lib

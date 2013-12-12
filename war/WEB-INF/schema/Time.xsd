@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://xsi-servlet.latest.j-tools.appspot.com/Time"
+	xmlns:tns="http://xsi-servlet.latest.j-tools.appspot.com/Time"
+	elementFormDefault="qualified">
+
+	<element name="Account" type="tns:Account">
+		<key name="accountAddressNameKey">
+			<selector xpath=".//tns:Address" />
+			<field xpath="@name" />
+		</key>
+		<keyref name="companyAddressRef" refer="tns:accountAddressNameKey">
+			<selector xpath=".//tns:Company/tns:Address" />
+			<field xpath="@name" />
+		</keyref>
+	</element>
+
+	<complexType name="Account">
+		<sequence>
+			<element name="Address" type="tns:Address" maxOccurs="unbounded"
+				minOccurs="0" xmlns:account="AccountAddress">
+
+			</element>
+			<element name="Company" type="tns:Company" nillable="true"
+				minOccurs="0" maxOccurs="unbounded">
+			</element>
+		</sequence>
+		<attribute name="name" type="tns:string60" use="required" />
+		<attribute name="remitTo" type="tns:string60" use="required" />
+
+	</complexType>
+
+	<complexType name="Address">
+		<!--
+			<complexContent> <extension base="tns:AddressObject">
+		-->
+		<attribute name="name" type="tns:string40" use="required" />
+		<attribute name="street1" type="tns:string40" />
+		<attribute name="street2" type="tns:string40" />
+		<attribute name="city" type="tns:string20" />
+		<attribute name="state" type="tns:string20" />
+		<attribute name="zip" type="tns:zip5or9" />
+		<!--             </extension>
+        </complexContent> -->
+	</complexType>
+
+	<complexType name="Company">
+		<sequence>
+			<element name="Address" type="tns:Address" />
+			<element name="Project" type="tns:Project" minOccurs="0"
+				maxOccurs="unbounded" />
+		</sequence>
+		<attribute name="name" type="tns:string60" use="required" />
+		<attribute name="billTo" type="tns:string60" use="required" />
+	</complexType>
+
+	<complexType name="Project">
+		<sequence>
+			<element name="Task" type="tns:Task" minOccurs="0" maxOccurs="unbounded" />
+		</sequence>
+		<attribute name="name" type="tns:string60" />
+	</complexType>
+
+	<complexType name="Task">
+		<sequence>
+			<element name="TimeEntry" minOccurs="0" maxOccurs="unbounded">
+				<complexType>
+					<attribute name="date" type="date" use="required" />
+					<attribute name="startTime" type="time" use="required" />
+					<attribute name="endTime" type="time" use="required" />
+					<attribute name="note" type="tns:string80" />
+				</complexType>
+			</element>
+		</sequence>
+		<attribute name="name" type="tns:string60" />
+	</complexType>
+
+
+	<simpleType name="string20">
+		<restriction base="string">
+			<maxLength value="20" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="string40">
+		<restriction base="string">
+			<maxLength value="40" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="string60">
+		<restriction base="string">
+			<maxLength value="60" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="string80">
+		<restriction base="string">
+			<maxLength value="80" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="zip5or9">
+		<restriction base="string">
+			<pattern value="\d{5}($|-\d{4})" />
+		</restriction>
+	</simpleType>
+
+</schema>

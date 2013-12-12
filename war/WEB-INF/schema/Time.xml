@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<Account xmlns="http://xsi-servlet.latest.j-tools.appspot.com/Time"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xsi-servlet.latest.j-tools.appspot.com/Time Time.xsd"
+	name="Jim" remitTo=""> 
+ 
+	<Address name="a1" />  
+	<Address name="a2" /> 
+	  
+	<Company name="" billTo="">  
+		<Address name="a" /> 
+		<Project>
+			<Task>
+				<TimeEntry endTime="12:00:00" date="2001-01-01"
+					startTime="12:00:00" />
+			</Task>
+		</Project>
+	</Company>
+
+</Account> 
