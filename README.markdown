@@ -1,13 +1,14 @@
-# Demo
+Demo
+------------
+XML Schema generated interfaces:
 
 http://xsd-servlet.jcalfee-info.appspot.com
 
-# Example XSDs
+Example XML Schema Files
+------------
+The files in this directory are automatically found, cached, and used to generate the demo screens above:
 
-These XML Schema files are used to generate the screens found in the Demo:
-
-
-
+https://github.com/jcalfee/xsd-interface/tree/master/war/WEB-INF/schema
 
 
 
